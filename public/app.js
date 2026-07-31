@@ -387,9 +387,19 @@ function openLightbox(startIndex) {
 
   const box = document.createElement('div')
   box.className = 'lb'
+  const pad = (n) => String(n).padStart(2, '0')
+
   box.innerHTML = `
     <button class="lb__close" type="button" aria-label="Закрыть">✕</button>
-    <div class="lb__count">${startIndex + 1} / ${images.length}</div>
+    ${
+      images.length > 1
+        ? `<div class="lb__count">
+             <span class="lb__num">${pad(startIndex + 1)}</span>
+             <span class="lb__sep"></span>
+             <span class="lb__total">${pad(images.length)}</span>
+           </div>`
+        : ''
+    }
     <div class="lb__track">
       ${images
         .map(
@@ -399,19 +409,19 @@ function openLightbox(startIndex) {
             </div>`,
         )
         .join('')}
-    </div>
-    <div class="lb__hint">Листайте влево и вправо · нажмите на фото, чтобы приблизить</div>`
+    </div>`
 
   document.body.appendChild(box)
   document.body.classList.add('no-scroll')
 
   const track = box.querySelector('.lb__track')
-  const counter = box.querySelector('.lb__count')
+  const number = box.querySelector('.lb__num')
   track.scrollLeft = startIndex * track.clientWidth
 
   track.addEventListener('scroll', () => {
+    if (!number) return
     const index = Math.round(track.scrollLeft / track.clientWidth)
-    counter.textContent = index + 1 + ' / ' + images.length
+    number.textContent = pad(index + 1)
   })
 
   const close = () => {
@@ -420,15 +430,6 @@ function openLightbox(startIndex) {
   }
 
   box.querySelector('.lb__close').addEventListener('click', close)
-
-  box.addEventListener('click', (event) => {
-    const img = event.target.closest('.lb__img')
-    if (img) {
-      img.classList.toggle('lb__img--zoom')
-      return
-    }
-    if (event.target.closest('.lb__slide')) close()
-  })
 }
 
 function addButtonHtml() {

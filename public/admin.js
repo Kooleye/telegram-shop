@@ -449,7 +449,9 @@ function render() {
           ? data.orders.map(orderCard).join('')
           : '<div class="panel"><p class="muted" style="margin:0">Заявок пока нет.</p></div>'
         : tab === 'products'
-          ? (draft ? editorPanel() : '') + productsPanel()
+          ? draft
+            ? editorPanel()
+            : productsPanel()
           : tab === 'categories'
             ? categoriesPanel()
             : bannersPanel()

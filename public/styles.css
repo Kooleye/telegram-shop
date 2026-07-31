@@ -26,7 +26,8 @@ body {
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Cormorant Garamond', 'Playfair Display', 'Didot', 'Bodoni MT', 'Hoefler Text', Garamond,
+    Georgia, 'Times New Roman', 'Noto Serif', serif;
   font-size: 15px;
   line-height: 1.5;
   padding-bottom: 96px;
@@ -869,54 +870,61 @@ body.no-scroll {
 .lb__slide {
   flex: 0 0 100%;
   scroll-snap-align: center;
-  overflow: auto;
   display: flex;
   align-items: center;
   justify-content: center;
+  touch-action: pinch-zoom;
 }
 
 .lb__img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  cursor: zoom-in;
-}
-
-.lb__img--zoom {
-  max-width: none;
-  max-height: none;
-  width: 230%;
-  cursor: zoom-out;
+  touch-action: pinch-zoom;
 }
 
 .lb__close {
   position: absolute;
-  top: max(12px, env(safe-area-inset-top));
-  right: 14px;
+  top: max(16px, env(safe-area-inset-top));
+  right: 18px;
   z-index: 2;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  border: none;
-  background: rgba(255, 255, 255, 0.16);
-  color: #fff;
-  font-size: 18px;
+  border: 1px solid rgba(230, 192, 138, 0.55);
+  background: rgba(23, 6, 12, 0.55);
+  backdrop-filter: blur(6px);
+  color: var(--gold-strong);
+  font-size: 16px;
+  line-height: 1;
 }
 
 .lb__count {
   position: absolute;
-  top: max(20px, env(safe-area-inset-top));
-  left: 18px;
+  top: max(26px, calc(env(safe-area-inset-top) + 10px));
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 2;
-  color: var(--text);
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--gold-strong);
+  font-size: 15px;
+  letter-spacing: 0.24em;
 }
 
-.lb__hint {
-  text-align: center;
-  color: var(--muted);
-  font-size: 13px;
-  padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
+.lb__num {
+  color: var(--gold-strong);
+}
+
+.lb__sep {
+  width: 26px;
+  height: 1px;
+  background: rgba(230, 192, 138, 0.6);
+}
+
+.lb__total {
+  color: rgba(230, 192, 138, 0.6);
 }
 
 /* ------------------------------------------------- описание и состав */
