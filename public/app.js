@@ -575,56 +575,100 @@ function renderCart() {
   setupCartForm()
 }
 
-// Приводит любой ввод к виду +7 (917) 767-92-25
-function formatPhone(raw) {
+// Цифры номера без кода страны: максимум 10 штук
+function phoneDigits(raw) {
   let digits = String(raw || '').replace(/\D/g, '')
-  if (!digits) return ''
-  if (digits[0] === '8') digits = '7' + digits.slice(1)
-  if (digits[0] !== '7') digits = '7' + digits
-  digits = digits.slice(0, 11)
+  if (digits[0] === '8' || digits[0] === '7') digits = digits.slice(1)
+  return digits.slice(0, 10)
+}
 
-  const a = digits.slice(1, 4)
-  const b = digits.slice(4, 7)
-  const c = digits.slice(7, 9)
-  const d = digits.slice(9, 11)
-
+// Собирает вид +7 (917) 767-92-25; «+7» есть всегда
+function formatPhoneDigits(digits) {
   let out = '+7'
-  if (a) out += ' (' + a
-  if (a.length === 3) out += ')'
-  if (b) out += ' ' + b
-  if (c) out += '-' + c
-  if (d) out += '-' + d
+  if (digits.length) out += ' (' + digits.slice(0, 3)
+  if (digits.length >= 3) out += ')'
+  if (digits.length > 3) out += ' ' + digits.slice(3, 6)
+  if (digits.length > 6) out += '-' + digits.slice(6, 8)
+  if (digits.length > 8) out += '-' + digits.slice(8, 10)
   return out
 }
 
-// Подставляет @ и чистит ссылку на Telegram
+// Для отправки: пусто, если цифр нет
+function formatPhone(raw) {
+  const digits = phoneDigits(raw)
+  return digits ? formatPhoneDigits(digits) : ''
+}
+
+// Ник всегда с собачкой в начале
+function telegramBody(raw) {
+  return String(raw || '')
+    .replace(/^https?:\/\//i, '')
+    .replace(/^t\.me\//i, '')
+    .replace(/[^A-Za-z0-9_]/g, '')
+    .slice(0, 32)
+}
+
+// Для отправки: пусто, если кроме собачки ничего нет
 function formatTelegram(raw) {
-  let value = String(raw || '').trim()
-  if (!value) return ''
-  value = value.replace(/^https?:\/\//i, '').replace(/^t\.me\//i, '')
-  value = value.replace(/[^A-Za-z0-9_@]/g, '')
-  value = value.replace(/@/g, '')
-  return value ? '@' + value : ''
+  const body = telegramBody(raw)
+  return body ? '@' + body : ''
 }
 
 function setupCartForm() {
   const phone = document.getElementById('phone')
   if (phone) {
-    phone.addEventListener('input', () => {
-      phone.value = formatPhone(phone.value)
-    })
+    let previous = phone.value
+
+    const applyPhone = (isDelete) => {
+      let digits = phoneDigits(phone.value)
+      // Если стёрли скобку или дефис — убираем последнюю цифру
+      if (isDelete && formatPhoneDigits(digits) === previous) digits = digits.slice(0, -1)
+      phone.value = formatPhoneDigits(digits)
+      previous = phone.value
+      const end = phone.value.length
+      try {
+        phone.setSelectionRange(end, end)
+      } catch {}
+    }
+
     phone.addEventListener('focus', () => {
-      if (!phone.value) phone.value = '+7 ('
+      if (!phone.value) {
+        phone.value = '+7'
+        previous = phone.value
+      }
+    })
+
+    phone.addEventListener('input', (event) => {
+      const isDelete = Boolean(event.inputType) && event.inputType.indexOf('delete') === 0
+      applyPhone(isDelete)
+    })
+
+    phone.addEventListener('blur', () => {
+      if (!phoneDigits(phone.value)) {
+        phone.value = ''
+        previous = ''
+      }
     })
   }
 
   const telegram = document.getElementById('telegram')
   if (telegram) {
+    const applyTag = () => {
+      telegram.value = '@' + telegramBody(telegram.value)
+      const end = telegram.value.length
+      try {
+        telegram.setSelectionRange(end, end)
+      } catch {}
+    }
+
     telegram.addEventListener('focus', () => {
       if (!telegram.value) telegram.value = '@'
     })
+
+    telegram.addEventListener('input', applyTag)
+
     telegram.addEventListener('blur', () => {
-      telegram.value = formatTelegram(telegram.value)
+      if (!telegramBody(telegram.value)) telegram.value = ''
     })
   }
 }
@@ -678,7 +722,7 @@ async function sendOrder() {
   const telegram = formatTelegram((document.getElementById('telegram') || {}).value || '')
   const comment = (document.getElementById('comment') || {}).value || ''
 
-  if (phone.replace(/\D/g, '').length < 10) {
+  if (phoneDigits(phone).length < 10) {
     state.error = 'Укажите, пожалуйста, корректный номер телефона.'
     return render()
   }
