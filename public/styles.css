@@ -1345,3 +1345,12 @@ body {
   object-position: center top;
   border-radius: 2px;
 }
+
+/* ---- жёсткая граница: дальше последнего фото листать нельзя */
+
+.gallery__track,
+.lb__track {
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: none;
+  overflow-y: hidden;
+}

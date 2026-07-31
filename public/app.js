@@ -383,11 +383,66 @@ function renderProduct(productId) {
 }
 
 /** Счётчик и точки под галереей товара. */
+/**
+ * Жёсткое правило: на последнем фото свайп влево (дальше) не работает,
+ * на первом — свайп вправо. Лента физически не сдвигается за край.
+ */
+function blockEdgeSwipe(track) {
+  let startX = null
+  let startY = null
+  let locked = false
+
+  track.addEventListener(
+    'touchstart',
+    (event) => {
+      if (event.touches.length > 1) {
+        startX = null
+        return
+      }
+      startX = event.touches[0].clientX
+      startY = event.touches[0].clientY
+      locked = false
+    },
+    { passive: true },
+  )
+
+  track.addEventListener(
+    'touchmove',
+    (event) => {
+      if (startX === null || event.touches.length > 1) return
+      const dx = event.touches[0].clientX - startX
+      const dy = event.touches[0].clientY - startY
+      if (!locked && Math.abs(dx) < Math.abs(dy)) return
+
+      const max = track.scrollWidth - track.clientWidth
+      const atEnd = track.scrollLeft >= max - 1
+      const atStart = track.scrollLeft <= 1
+
+      if ((dx < 0 && atEnd) || (dx > 0 && atStart)) {
+        locked = true
+        if (event.cancelable) event.preventDefault()
+      }
+    },
+    { passive: false },
+  )
+
+  track.addEventListener(
+    'touchend',
+    () => {
+      startX = null
+      locked = false
+    },
+    { passive: true },
+  )
+}
+
 function setupGallery() {
   const track = document.getElementById('galleryTrack')
   if (!track) return
   const count = document.getElementById('galleryCount')
   const dots = document.getElementById('galleryDots')
+
+  blockEdgeSwipe(track)
 
   // Листание полностью нативное — только обновляем счётчик и точки
   track.addEventListener('scroll', () => {
@@ -460,6 +515,8 @@ function openLightbox(startIndex) {
       track.scrollTo({ left: 0, behavior: 'smooth' })
     }
   }
+
+  blockEdgeSwipe(track)
 
   track.addEventListener('scroll', () => {
     if (number) number.textContent = pad(currentIndex() + 1)
