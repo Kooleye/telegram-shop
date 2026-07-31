@@ -220,7 +220,6 @@ function renderCatalogList() {
   const { categories, products } = state.catalog
 
   app.innerHTML = `
-    ${bannersHtml()}
     ${navHtml('catalog')}
     ${sectionTitle('Каталог')}
 
@@ -264,7 +263,6 @@ function renderSale() {
   const list = state.catalog.products.filter((p) => discountOf(p) > 0)
 
   app.innerHTML = `
-    ${bannersHtml()}
     ${navHtml('sale')}
     ${sectionTitle('Акции и скидки')}
     ${gridHtml(list, 'Сейчас скидок нет — загляните позже')}
@@ -548,12 +546,20 @@ function renderCart() {
     ${state.error ? `<div class="error">${escapeHtml(state.error)}</div>` : ''}
 
     <div class="notice">
-      Оплачивать здесь ничего не нужно. Мы перезвоним, подт��ердим наличие и вместе выберем способ доставки.
+      Оплачивать здесь ничего не нужно. Мы перезвоним, подтвердим наличие и вместе выберем способ доставки.
     </div>
 
     <div class="field">
       <label for="phone">Телефон для связи</label>
-      <input id="phone" type="tel" inputmode="tel" placeholder="+7 900 000-00-00" value="${escapeHtml(localStorage.getItem('phone') || '')}" />
+      <input class="input--phone" id="phone" type="tel" inputmode="tel" autocomplete="tel"
+        placeholder="+7 (900) 000-00-00" value="${escapeHtml(formatPhone(localStorage.getItem('phone') || ''))}" />
+    </div>
+
+    <div class="field">
+      <label for="telegram">Ваш Telegram для связи</label>
+      <input class="input--tag" id="telegram" type="text" autocapitalize="off" autocomplete="off" spellcheck="false"
+        placeholder="@username" value="${escapeHtml(localStorage.getItem('telegram') || '')}" />
+      <div class="field__hint">Укажите ник — напишем вам в Telegram, если не дозвонимся</div>
     </div>
 
     <div class="field">
@@ -565,6 +571,62 @@ function renderCart() {
       ${state.sending ? 'Отправляем…' : 'Отправить заявку'}
     </button>
     <button class="btn btn--ghost" data-go="home">Продолжить покупки</button>`
+
+  setupCartForm()
+}
+
+// Приводит любой ввод к виду +7 (917) 767-92-25
+function formatPhone(raw) {
+  let digits = String(raw || '').replace(/\D/g, '')
+  if (!digits) return ''
+  if (digits[0] === '8') digits = '7' + digits.slice(1)
+  if (digits[0] !== '7') digits = '7' + digits
+  digits = digits.slice(0, 11)
+
+  const a = digits.slice(1, 4)
+  const b = digits.slice(4, 7)
+  const c = digits.slice(7, 9)
+  const d = digits.slice(9, 11)
+
+  let out = '+7'
+  if (a) out += ' (' + a
+  if (a.length === 3) out += ')'
+  if (b) out += ' ' + b
+  if (c) out += '-' + c
+  if (d) out += '-' + d
+  return out
+}
+
+// Подставляет @ и чистит ссылку на Telegram
+function formatTelegram(raw) {
+  let value = String(raw || '').trim()
+  if (!value) return ''
+  value = value.replace(/^https?:\/\//i, '').replace(/^t\.me\//i, '')
+  value = value.replace(/[^A-Za-z0-9_@]/g, '')
+  value = value.replace(/@/g, '')
+  return value ? '@' + value : ''
+}
+
+function setupCartForm() {
+  const phone = document.getElementById('phone')
+  if (phone) {
+    phone.addEventListener('input', () => {
+      phone.value = formatPhone(phone.value)
+    })
+    phone.addEventListener('focus', () => {
+      if (!phone.value) phone.value = '+7 ('
+    })
+  }
+
+  const telegram = document.getElementById('telegram')
+  if (telegram) {
+    telegram.addEventListener('focus', () => {
+      if (!telegram.value) telegram.value = '@'
+    })
+    telegram.addEventListener('blur', () => {
+      telegram.value = formatTelegram(telegram.value)
+    })
+  }
 }
 
 function renderDone(number) {
@@ -612,7 +674,8 @@ function go(hash) {
 // ------------------------------------------------------------- отправка
 
 async function sendOrder() {
-  const phone = (document.getElementById('phone') || {}).value || ''
+  const phone = formatPhone((document.getElementById('phone') || {}).value || '')
+  const telegram = formatTelegram((document.getElementById('telegram') || {}).value || '')
   const comment = (document.getElementById('comment') || {}).value || ''
 
   if (phone.replace(/\D/g, '').length < 10) {
@@ -621,6 +684,7 @@ async function sendOrder() {
   }
 
   localStorage.setItem('phone', phone)
+  localStorage.setItem('telegram', telegram)
   state.error = ''
   state.sending = true
   render()
@@ -632,6 +696,7 @@ async function sendOrder() {
       body: JSON.stringify({
         items: state.cart,
         phone,
+        telegram,
         comment,
         initData: tg ? tg.initData : '',
       }),

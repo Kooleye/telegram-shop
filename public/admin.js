@@ -94,6 +94,7 @@ function orderCard(order) {
         ${escapeHtml(order.customer.name)}
         ${order.customer.username ? ' · @' + escapeHtml(order.customer.username) : ''}
         ${order.customer.phone ? ' · ' + escapeHtml(order.customer.phone) : ''}
+        ${order.customer.telegram ? ' · ' + escapeHtml(order.customer.telegram) : ''}
       </p>
       ${order.comment ? `<p class="muted">Комментарий: ${escapeHtml(order.comment)}</p>` : ''}
       <div class="row" style="margin-top:12px">

@@ -55,7 +55,9 @@
       "price": 4890,
       "oldPrice": 5900,
       "images": [
-        "/photos/hoodie.jpg"
+        "/photos/hoodie.jpg",
+        "/photos/hoodie-2.jpg",
+        "/photos/hoodie-3.jpg"
       ],
       "variants": [
         {
@@ -84,7 +86,9 @@
       "price": 1690,
       "oldPrice": null,
       "images": [
-        "/photos/tshirt.jpg"
+        "/photos/tshirt.jpg",
+        "/photos/tshirt-2.jpg",
+        "/photos/tshirt-3.jpg"
       ],
       "variants": [
         {
@@ -117,7 +121,9 @@
       "price": 6490,
       "oldPrice": null,
       "images": [
-        "/photos/dress.jpg"
+        "/photos/dress.jpg",
+        "/photos/dress-2.jpg",
+        "/photos/dress-3.jpg"
       ],
       "variants": [
         {
@@ -146,7 +152,9 @@
       "price": 5290,
       "oldPrice": 6490,
       "images": [
-        "/photos/jeans.jpg"
+        "/photos/jeans.jpg",
+        "/photos/jeans-2.jpg",
+        "/photos/jeans-3.jpg"
       ],
       "variants": [
         {
@@ -179,7 +187,9 @@
       "price": 12900,
       "oldPrice": null,
       "images": [
-        "/photos/coat.jpg"
+        "/photos/coat.jpg",
+        "/photos/coat-2.jpg",
+        "/photos/coat-3.jpg"
       ],
       "variants": [
         {
@@ -208,7 +218,9 @@
       "price": 3790,
       "oldPrice": null,
       "images": [
-        "/photos/skirt.jpg"
+        "/photos/skirt.jpg",
+        "/photos/skirt-2.jpg",
+        "/photos/skirt-3.jpg"
       ],
       "variants": [
         {

@@ -146,6 +146,7 @@ function formatOrderForManager(order) {
   lines.push(`Клиент: ${escapeHtml(order.customer.name || '—')}`)
   if (order.customer.username) lines.push(`Telegram: @${escapeHtml(order.customer.username)}`)
   if (order.customer.phone) lines.push(`Телефон: ${escapeHtml(order.customer.phone)}`)
+  if (order.customer.telegram) lines.push(`Telegram клиента: ${escapeHtml(order.customer.telegram)}`)
   if (order.comment) lines.push(`Комментарий: ${escapeHtml(order.comment)}`)
   return lines.join('\n')
 }
@@ -287,6 +288,7 @@ async function createOrder(req, res) {
       name: (tgUser ? [tgUser.first_name, tgUser.last_name].filter(Boolean).join(' ') : body.name) || 'Без имени',
       username: tgUser ? tgUser.username || '' : '',
       phone: String(body.phone || '').slice(0, 32),
+      telegram: String(body.telegram || '').slice(0, 64),
     },
     comment: String(body.comment || '').slice(0, 500),
     items: resolved,
