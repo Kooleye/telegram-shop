@@ -9,6 +9,8 @@
   --gold: #e6c08a;
   --gold-strong: #f0d3a6;
   --sale: #ff7a6b;
+  --price: #f3ece8;
+  --sans: 'Helvetica Neue', Helvetica, Arial, 'Segoe UI', Roboto, sans-serif;
   --radius: 2px;
 }
 
@@ -68,15 +70,17 @@ button {
   background: none;
   border: none;
   color: var(--text);
-  padding: 6px 0;
+  padding: 2px 0 6px;
   width: 100%;
   text-align: center;
-  font-size: 19px;
+  font-family: 'Pinyon Script', 'Parisienne', 'Great Vibes', 'Snell Roundhand', 'Apple Chancery', cursive;
+  font-size: 30px;
+  line-height: 1.1;
   font-weight: 400;
-  letter-spacing: 0.32em;
-  text-indent: 0.32em;
+  letter-spacing: 0.01em;
+  text-indent: 0;
   margin: 0;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .topbar__back {
@@ -374,17 +378,21 @@ button {
 }
 
 .card__price {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--gold);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--price);
   display: flex;
   align-items: baseline;
   gap: 8px;
 }
 
 .card__old {
-  font-size: 13px;
+  font-family: var(--sans);
+  font-size: 12px;
   font-weight: 400;
+  letter-spacing: 0.06em;
   color: var(--muted);
   text-decoration: line-through;
 }
@@ -414,9 +422,11 @@ button {
 }
 
 .product__price {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--gold);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--price);
   display: flex;
   align-items: baseline;
   gap: 10px;
@@ -424,8 +434,10 @@ button {
 }
 
 .product__old {
-  font-size: 15px;
+  font-family: var(--sans);
+  font-size: 13px;
   font-weight: 400;
+  letter-spacing: 0.06em;
   color: var(--muted);
   text-decoration: line-through;
 }
@@ -858,9 +870,11 @@ body.no-scroll {
   flex: 1;
   display: flex;
   overflow-x: auto;
+  overflow-y: hidden;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pinch-zoom;
 }
 
 .lb__track::-webkit-scrollbar {
@@ -873,14 +887,25 @@ body.no-scroll {
   display: flex;
   align-items: center;
   justify-content: center;
-  touch-action: pinch-zoom;
+  touch-action: pan-x pinch-zoom;
 }
 
 .lb__img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  touch-action: pinch-zoom;
+  touch-action: pan-x pinch-zoom;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.lb__hint {
+  text-align: center;
+  padding: 14px 16px calc(20px + env(safe-area-inset-bottom));
+  color: rgba(230, 192, 138, 0.75);
+  font-size: 16px;
+  font-style: italic;
+  letter-spacing: 0.08em;
 }
 
 .lb__close {

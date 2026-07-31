@@ -17,6 +17,12 @@ const cartBtn = document.getElementById('cartBtn')
 const cartCount = document.getElementById('cartCount')
 const shopName = document.getElementById('shopName')
 
+// Фирменное написание названия магазина прописью
+function wordmark(name) {
+  const raw = String(name || '').trim()
+  return raw.toLowerCase() === 'paulea' ? 'pauléa' : raw
+}
+
 let lastRoute = null
 
 // -------------------------------------------------------------- Telegram
@@ -409,7 +415,12 @@ function openLightbox(startIndex) {
             </div>`,
         )
         .join('')}
-    </div>`
+    </div>
+    ${
+      images.length > 1
+        ? '<div class="lb__hint">Листайте влево или вправо</div>'
+        : ''
+    }`
 
   document.body.appendChild(box)
   document.body.classList.add('no-scroll')
@@ -430,6 +441,51 @@ function openLightbox(startIndex) {
   }
 
   box.querySelector('.lb__close').addEventListener('click', close)
+
+  // Запасное листание свайпом: если Telegram перехватывает жесты,
+  // сами перелистываем на соседнее фото
+  let startX = null
+  let startY = null
+  let multi = false
+
+  const goTo = (index) => {
+    const safe = Math.max(0, Math.min(images.length - 1, index))
+    track.scrollTo({ left: safe * track.clientWidth, behavior: 'smooth' })
+    if (number) number.textContent = pad(safe + 1)
+  }
+
+  track.addEventListener(
+    'touchstart',
+    (event) => {
+      multi = event.touches.length > 1
+      startX = event.touches[0].clientX
+      startY = event.touches[0].clientY
+    },
+    { passive: true },
+  )
+
+  track.addEventListener(
+    'touchmove',
+    (event) => {
+      if (event.touches.length > 1) multi = true
+    },
+    { passive: true },
+  )
+
+  track.addEventListener(
+    'touchend',
+    (event) => {
+      if (multi || startX === null) return
+      const touch = event.changedTouches[0]
+      const dx = touch.clientX - startX
+      const dy = touch.clientY - startY
+      startX = null
+      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return
+      const current = Math.round(track.scrollLeft / track.clientWidth)
+      goTo(dx < 0 ? current + 1 : current - 1)
+    },
+    { passive: true },
+  )
 }
 
 function addButtonHtml() {
@@ -490,7 +546,7 @@ function renderCart() {
     ${state.error ? `<div class="error">${escapeHtml(state.error)}</div>` : ''}
 
     <div class="notice">
-      Оплачивать здесь ничего не нужно. Мы перезвоним, подтвердим наличие и вместе выберем способ доставки.
+      Оплачивать здесь ничего не нужно. Мы перезвоним, подт��ердим наличие и вместе выберем способ доставки.
     </div>
 
     <div class="field">
@@ -660,7 +716,7 @@ async function init() {
     return
   }
 
-  shopName.textContent = state.catalog.shop.name
+  shopName.textContent = wordmark(state.catalog.shop.name)
   document.title = state.catalog.shop.name
   render()
 }
