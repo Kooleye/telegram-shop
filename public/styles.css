@@ -864,6 +864,16 @@ body.no-scroll {
   background: #17060c;
   display: flex;
   flex-direction: column;
+  padding-top: max(6px, env(safe-area-inset-top));
+}
+
+.lb__bar {
+  position: relative;
+  flex: 0 0 auto;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .lb__track {
@@ -900,21 +910,24 @@ body.no-scroll {
 }
 
 .lb__hint {
+  flex: 0 0 auto;
   text-align: center;
-  padding: 14px 16px calc(20px + env(safe-area-inset-bottom));
-  color: rgba(230, 192, 138, 0.75);
-  font-size: 16px;
+  padding: 6px 16px calc(8px + env(safe-area-inset-bottom));
+  color: rgba(240, 211, 166, 0.8);
+  font-size: 14px;
+  line-height: 1.2;
   font-style: italic;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
 }
 
 .lb__close {
   position: absolute;
-  top: max(16px, env(safe-area-inset-top));
-  right: 18px;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
   z-index: 2;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: 1px solid rgba(230, 192, 138, 0.55);
   background: rgba(23, 6, 12, 0.55);
@@ -925,16 +938,11 @@ body.no-scroll {
 }
 
 .lb__count {
-  position: absolute;
-  top: max(26px, calc(env(safe-area-inset-top) + 10px));
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
   display: flex;
   align-items: center;
   gap: 12px;
   color: var(--gold-strong);
-  font-size: 15px;
+  font-size: 16px;
   letter-spacing: 0.24em;
 }
 
@@ -945,11 +953,11 @@ body.no-scroll {
 .lb__sep {
   width: 26px;
   height: 1px;
-  background: rgba(230, 192, 138, 0.6);
+  background: rgba(240, 211, 166, 0.85);
 }
 
 .lb__total {
-  color: rgba(230, 192, 138, 0.6);
+  color: rgba(240, 211, 166, 0.8);
 }
 
 /* ------------------------------------------------- описание и состав */

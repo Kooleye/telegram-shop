@@ -396,16 +396,18 @@ function openLightbox(startIndex) {
   const pad = (n) => String(n).padStart(2, '0')
 
   box.innerHTML = `
-    <button class="lb__close" type="button" aria-label="Закрыть">✕</button>
-    ${
-      images.length > 1
-        ? `<div class="lb__count">
-             <span class="lb__num">${pad(startIndex + 1)}</span>
-             <span class="lb__sep"></span>
-             <span class="lb__total">${pad(images.length)}</span>
-           </div>`
-        : ''
-    }
+    <div class="lb__bar">
+      ${
+        images.length > 1
+          ? `<div class="lb__count">
+               <span class="lb__num">${pad(startIndex + 1)}</span>
+               <span class="lb__sep"></span>
+               <span class="lb__total">${pad(images.length)}</span>
+             </div>`
+          : ''
+      }
+      <button class="lb__close" type="button" aria-label="Закрыть">✕</button>
+    </div>
     <div class="lb__track">
       ${images
         .map(
