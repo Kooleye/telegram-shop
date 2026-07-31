@@ -120,6 +120,21 @@ function discountOf(product) {
     : 0
 }
 
+// Едва заметная плашка «Последний размер»: остался ровно один размер в наличии
+function lastSizeBadgeHtml(product) {
+  const settings = (state.catalog.shop && state.catalog.shop.lastSizeBadge) || {}
+  if (settings.enabled === false) return ''
+
+  const variants = product.variants || []
+  const available = variants.filter((v) => v.stock > 0)
+  if (available.length !== 1) return ''
+  // Сумки и аксессуары с единым размером плашку не получают
+  if (variants.length === 1 && variants[0].size === 'Один размер') return ''
+
+  const text = settings.text || 'Последний размер'
+  return `<span class="badge badge--last">${escapeHtml(text)}</span>`
+}
+
 // ----------------------------------------------------- общие блоки витрины
 
 function bannersHtml() {
@@ -185,6 +200,7 @@ function productCard(product) {
           ${discount ? `<span class="badge">−${discount}%</span>` : ''}
           ${product.isHit ? '<span class="badge badge--hit">🔥 Хит</span>' : ''}
           ${product.isNew ? '<span class="badge badge--new">New</span>' : ''}
+          ${lastSizeBadgeHtml(product)}
           ${!product.inStock ? '<span class="badge badge--out">Раскуплено</span>' : ''}
         </div>
       </div>

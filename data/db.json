@@ -4,7 +4,11 @@
     "tagline": "Женская одежда с примеркой в магазине",
     "currency": "₽",
     "address": "г. Стерлитамак",
-    "workingHours": "ежедневно 10:00–21:00"
+    "workingHours": "ежедневно 10:00–21:00",
+    "lastSizeBadge": {
+      "enabled": true,
+      "text": "Последний размер"
+    }
   },
   "orderCounter": 0,
   "categories": [
@@ -62,7 +66,7 @@
       "variants": [
         {
           "size": "S",
-          "stock": 2
+          "stock": 0
         },
         {
           "size": "M",

@@ -236,7 +236,16 @@ function publicCatalog() {
 
   const banners = (data.banners || []).filter((b) => b.isActive !== false)
 
-  return { shop: data.shop, categories, products, banners }
+  const badge = (data.shop && data.shop.lastSizeBadge) || {}
+  const shop = {
+    ...data.shop,
+    lastSizeBadge: {
+      enabled: badge.enabled !== false,
+      text: String(badge.text || 'Последний размер').slice(0, 40),
+    },
+  }
+
+  return { shop, categories, products, banners }
 }
 
 // -------------------------------------------------------------------- заявки
@@ -351,6 +360,19 @@ const server = http.createServer(async (req, res) => {
             : [],
           telegramConfigured: Boolean(BOT_TOKEN && MANAGER_CHAT_ID),
         })
+      }
+
+      // Настройки плашки «Последний размер»
+      if (pathname === '/api/admin/last-size-badge' && req.method === 'POST') {
+        const body = await readBody(req)
+        data.shop = data.shop || {}
+        const text = String(body.text || '').slice(0, 40).trim()
+        data.shop.lastSizeBadge = {
+          enabled: body.enabled !== false,
+          text: text || 'Последний размер',
+        }
+        saveDb()
+        return json(res, 200, { ok: true, lastSizeBadge: data.shop.lastSizeBadge })
       }
 
       if (pathname === '/api/admin/order-status' && req.method === 'POST') {

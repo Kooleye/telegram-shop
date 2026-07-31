@@ -134,8 +134,38 @@ function productRow(product) {
     </div>`
 }
 
+/** Настройка плашки «Последний размер». */
+function lastSizePanel() {
+  const badge = (data.shop && data.shop.lastSizeBadge) || {}
+  const enabled = badge.enabled !== false
+  const text = badge.text || 'Последний размер'
+
+  return `
+    <div class="panel">
+      <h3 style="margin:0 0 6px">Плашка «Последний размер»</h3>
+      <p class="muted">Появляется на фото товара в каталоге, когда в наличии остался ровно один размер.
+        Считается автоматически по остаткам размеров.</p>
+
+      <label class="check">
+        <input id="lsb-on" type="checkbox" ${enabled ? 'checked' : ''} />
+        Показывать плашку в витрине
+      </label>
+
+      <div class="field" style="margin-top:12px">
+        <label for="lsb-text">Текст плашки</label>
+        <input id="lsb-text" type="text" maxlength="40" value="${escapeHtml(text)}" placeholder="Последний размер" />
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <button class="btn" data-lsb-save="1">Сохранить плашку</button>
+        <span id="lsb-status" class="muted"></span>
+      </div>
+    </div>`
+}
+
 function productsPanel() {
   return `
+    ${lastSizePanel()}
     <div class="panel">
       <div class="row row--between">
         <h3 style="margin:0">Товары (${data.products.length})</h3>
@@ -281,7 +311,7 @@ function editorPanel() {
           oneSize
             ? `<div class="sizes-editor">
                  <div class="size-row">
-                   <div><b>Один размер</b><div class="muted">в витрине выбор ��азмера не показывается</div></div>
+                   <div><b>Один размер</b><div class="muted">в витрине выбор размера не показывается</div></div>
                    <div class="stepper">
                      <button type="button" data-step="-1" data-index="0">−</button>
                      <input type="number" min="0" value="${draft.variants[0].stock}" data-stock="0" />
@@ -475,6 +505,23 @@ root.addEventListener('click', async (event) => {
   if (d.status) {
     await api('/api/admin/order-status', { id: d.order, status: d.status })
     return load()
+  }
+
+  if (d.lsbSave) {
+    const status = document.getElementById('lsb-status')
+    const on = document.getElementById('lsb-on')
+    const textField = document.getElementById('lsb-text')
+    if (status) status.textContent = 'Сохраняем…'
+    const result = await api('/api/admin/last-size-badge', {
+      enabled: on ? on.checked : true,
+      text: textField ? textField.value : '',
+    })
+    if (result && result.lastSizeBadge) {
+      data.shop = data.shop || {}
+      data.shop.lastSizeBadge = result.lastSizeBadge
+    }
+    if (status) status.textContent = 'Сохранено'
+    return render()
   }
 
   if (d.bannerDelete) {
