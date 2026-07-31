@@ -841,6 +841,15 @@ function go(hash) {
 
 // ------------------------------------------------------------- отправка
 
+/** Перезагружает каталог с сервера (актуальные остатки размеров). */
+async function refreshCatalog() {
+  try {
+    const response = await fetch('/api/catalog', { cache: 'no-store' })
+    const fresh = await response.json()
+    if (fresh && Array.isArray(fresh.products)) state.catalog = fresh
+  } catch {}
+}
+
 async function sendOrder() {
   const name = String((document.getElementById('name') || {}).value || '')
     .trim()
@@ -884,6 +893,8 @@ async function sendOrder() {
     state.cart = []
     saveCart()
     state.sending = false
+    // Остатки уже списаны на сервере — подтягиваем свежий каталог
+    await refreshCatalog()
     if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success')
     go('/done/' + encodeURIComponent(result.number))
   } catch {

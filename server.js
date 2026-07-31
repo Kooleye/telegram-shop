@@ -307,6 +307,16 @@ async function createOrder(req, res) {
     total,
   }
 
+  // Списываем остатки: купленный размер сразу уходит с витрины
+  for (const item of resolved) {
+    const product = data.products.find((p) => p.id === item.productId)
+    if (!product) continue
+    const variant = product.variants.find((v) => v.size === item.size)
+    if (!variant) continue
+    variant.stock = Math.max(0, (Number(variant.stock) || 0) - item.qty)
+  }
+  order.stockApplied = true
+
   data.orders.unshift(order)
   data.orderCounter += 1
   saveDb()
@@ -382,7 +392,33 @@ const server = http.createServer(async (req, res) => {
         const body = await readBody(req)
         const order = data.orders.find((o) => o.id === body.id)
         if (!order) return json(res, 404, { error: 'Заявка не найдена' })
+        const wasCancelled = order.status === 'cancelled'
         order.status = body.status
+
+        // Отменили заявку — вещи возвращаются на витрину
+        if (!wasCancelled && order.status === 'cancelled' && order.stockApplied) {
+          for (const item of order.items) {
+            const product = data.products.find((p) => p.id === item.productId)
+            if (!product) continue
+            const variant = product.variants.find((v) => v.size === item.size)
+            if (!variant) continue
+            variant.stock = Math.max(0, (Number(variant.stock) || 0) + item.qty)
+          }
+          order.stockApplied = false
+        }
+
+        // Сняли отмену — снова списываем
+        if (wasCancelled && order.status !== 'cancelled' && !order.stockApplied) {
+          for (const item of order.items) {
+            const product = data.products.find((p) => p.id === item.productId)
+            if (!product) continue
+            const variant = product.variants.find((v) => v.size === item.size)
+            if (!variant) continue
+            variant.stock = Math.max(0, (Number(variant.stock) || 0) - item.qty)
+          }
+          order.stockApplied = true
+        }
+
         saveDb()
         return json(res, 200, { ok: true })
       }
