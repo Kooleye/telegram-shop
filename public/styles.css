@@ -1186,3 +1186,19 @@ body {
     border-radius: 22px;
   }
 }
+
+/* ------------------- полноэкранное фото: без залипания и чёрной полосы */
+
+.lb__track {
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: none;
+  scroll-snap-type: x mandatory;
+}
+
+.lb__slide {
+  flex: 0 0 100%;
+  width: 100%;
+  max-width: 100%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}

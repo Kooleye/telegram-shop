@@ -429,10 +429,23 @@ function openLightbox(startIndex) {
   const number = box.querySelector('.lb__num')
   track.scrollLeft = startIndex * track.clientWidth
 
+  let settleTimer = null
+
+  const currentIndex = () =>
+    Math.max(0, Math.min(images.length - 1, Math.round(track.scrollLeft / track.clientWidth)))
+
+  // Возвращает фото ровно на место, если свайп остановился между кадрами
+  const settle = () => {
+    const target = currentIndex() * track.clientWidth
+    if (Math.abs(track.scrollLeft - target) > 1) {
+      track.scrollTo({ left: target, behavior: 'smooth' })
+    }
+  }
+
   track.addEventListener('scroll', () => {
-    if (!number) return
-    const index = Math.round(track.scrollLeft / track.clientWidth)
-    number.textContent = pad(index + 1)
+    if (number) number.textContent = pad(currentIndex() + 1)
+    if (settleTimer) clearTimeout(settleTimer)
+    settleTimer = setTimeout(settle, 140)
   })
 
   const close = () => {
@@ -475,13 +488,16 @@ function openLightbox(startIndex) {
   track.addEventListener(
     'touchend',
     (event) => {
-      if (multi || startX === null) return
+      if (multi || startX === null) {
+        startX = null
+        return settle()
+      }
       const touch = event.changedTouches[0]
       const dx = touch.clientX - startX
       const dy = touch.clientY - startY
       startX = null
-      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return
-      const current = Math.round(track.scrollLeft / track.clientWidth)
+      const current = currentIndex()
+      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return goTo(current)
       goTo(dx < 0 ? current + 1 : current - 1)
     },
     { passive: true },
