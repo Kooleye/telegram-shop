@@ -328,12 +328,8 @@ async function createOrder(req, res) {
     console.log('------------------------------------------------------------\n')
   }
 
-  if (tgUser && tgUser.id) {
-    await sendTelegram(
-      tgUser.id,
-      `Спасибо! Заявка ${order.number} принята.\nМенеджер свяжется с вами в ближайшее время и уточнит доставку.`,
-    )
-  }
+  // Автоответ клиенту в Telegram не отправляем: подтверждение он
+  // видит на самой витрине, а в бот уходит только уведомление менеджеру.
 
   return json(res, 200, { ok: true, number: order.number, total })
 }
