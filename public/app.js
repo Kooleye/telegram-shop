@@ -202,8 +202,8 @@ function productCard(product) {
           ${product.isNew ? '<span class="badge badge--new">New</span>' : ''}
           ${!product.inStock ? '<span class="badge badge--out">Раскуплено</span>' : ''}
         </div>
+        ${lastSizeBadgeHtml(product)}
       </div>
-      ${lastSizeBadgeHtml(product)}
       <div class="card__name">${escapeHtml(product.name)}</div>
       <div class="card__price">
         ${money(product.price)}

@@ -1275,3 +1275,42 @@ body {
   flex: 1 1 0;
   min-width: 0;
 }
+
+/* --- «Последний размер»: тонкая полоска внутри фото, снизу по центру */
+
+.card__last {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin: 0;
+  padding: 6px 8px 7px;
+  font-family: var(--sans);
+  font-size: 8.5px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+  color: rgba(255, 250, 245, 0.92);
+  background: linear-gradient(to top, rgba(24, 6, 12, 0.62), rgba(24, 6, 12, 0));
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card__last span {
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card__last::before,
+.card__last::after {
+  content: none;
+}
