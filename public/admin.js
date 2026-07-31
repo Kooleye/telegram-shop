@@ -281,7 +281,7 @@ function editorPanel() {
           oneSize
             ? `<div class="sizes-editor">
                  <div class="size-row">
-                   <div><b>Один размер</b><div class="muted">в витрине выбор размера не показывается</div></div>
+                   <div><b>Один размер</b><div class="muted">в витрине выбор ��азмера не показывается</div></div>
                    <div class="stepper">
                      <button type="button" data-step="-1" data-index="0">−</button>
                      <input type="number" min="0" value="${draft.variants[0].stock}" data-stock="0" />
@@ -369,7 +369,7 @@ function bannersPanel() {
               .map(
                 (b) => `
                 <div class="prod-row">
-                  <img src="${escapeHtml(b.image)}" alt="" />
+                  <img src="${escapeHtml(b.image)}" alt="" style="border-radius:12px" />
                   <div style="flex:1;min-width:0">
                     <div class="muted">${escapeHtml(b.image)}</div>
                     <button class="chip" data-banner-delete="${b.id}" style="margin-top:8px">Удалить</button>

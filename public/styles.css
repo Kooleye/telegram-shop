@@ -1146,3 +1146,43 @@ body {
   color: rgba(247, 241, 236, 0.45);
   -webkit-text-fill-color: rgba(247, 241, 236, 0.45);
 }
+
+/* --------------------------- баннеры акций: мягкие закруглённые края */
+
+.banners {
+  gap: 12px;
+  margin-top: 18px;
+  padding-bottom: 2px;
+}
+
+.banner {
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22);
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
+.banner img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
+}
+
+.banner-empty {
+  margin-top: 18px;
+  border: 1px dashed var(--border);
+  border-radius: 18px;
+  padding: 26px 22px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+@media (min-width: 480px) {
+  .banner,
+  .banner img,
+  .banner-empty {
+    border-radius: 22px;
+  }
+}
