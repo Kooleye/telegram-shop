@@ -615,6 +615,18 @@ function updateSizeSelection(size) {
   }
 }
 
+/** Иконка корзины для кнопки «Убрать». */
+function trashIcon() {
+  return `
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+      <path d="M4 7h16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+      <path d="M9.5 4.5h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+      <path d="M6.5 7l.8 11.2A1.8 1.8 0 0 0 9.1 20h5.8a1.8 1.8 0 0 0 1.8-1.8L17.5 7"
+        stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M10.4 10.6v6M13.6 10.6v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+    </svg>`
+}
+
 function renderCart() {
   if (state.cart.length === 0) {
     app.innerHTML = `
@@ -635,8 +647,11 @@ function renderCart() {
           <div class="line__body">
             <div class="line__name">${escapeHtml(product.name)}</div>
             <div class="line__meta">Размер ${escapeHtml(line.size)} · ${line.qty} шт. · ${money(product.price * line.qty)}</div>
-            <button class="line__remove" data-remove="${index}">Убрать</button>
           </div>
+          <button class="line__remove" data-remove="${index}" type="button"
+            aria-label="Убрать из заявки" title="Убрать из заявки">
+            ${trashIcon()}
+          </button>
         </div>`
     })
     .join('')
@@ -650,6 +665,12 @@ function renderCart() {
 
     <div class="notice">
       Оплачивать здесь ничего не нужно. Мы перезвоним, подтвердим наличие и вместе выберем способ доставки.
+    </div>
+
+    <div class="field">
+      <label for="name">Ваше имя</label>
+      <input class="input--name" id="name" type="text" autocomplete="name"
+        placeholder="Как к вам обращаться" value="" />
     </div>
 
     <div class="field">
@@ -821,6 +842,9 @@ function go(hash) {
 // ------------------------------------------------------------- отправка
 
 async function sendOrder() {
+  const name = String((document.getElementById('name') || {}).value || '')
+    .trim()
+    .slice(0, 80)
   const phone = formatPhone((document.getElementById('phone') || {}).value || '')
   const telegram = formatTelegram((document.getElementById('telegram') || {}).value || '')
   const comment = (document.getElementById('comment') || {}).value || ''
@@ -842,6 +866,7 @@ async function sendOrder() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         items: state.cart,
+        name,
         phone,
         telegram,
         comment,

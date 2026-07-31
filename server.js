@@ -294,7 +294,10 @@ async function createOrder(req, res) {
     status: 'new',
     customer: {
       tgId: tgUser ? tgUser.id : null,
-      name: (tgUser ? [tgUser.first_name, tgUser.last_name].filter(Boolean).join(' ') : body.name) || 'Без имени',
+      name:
+        String(body.name || '').trim().slice(0, 80) ||
+        (tgUser ? [tgUser.first_name, tgUser.last_name].filter(Boolean).join(' ') : '') ||
+        'Без имени',
       username: tgUser ? tgUser.username || '' : '',
       phone: String(body.phone || '').slice(0, 32),
       telegram: String(body.telegram || '').slice(0, 64),
