@@ -132,7 +132,7 @@ function lastSizeBadgeHtml(product) {
   if (variants.length === 1 && variants[0].size === 'Один размер') return ''
 
   const text = settings.text || 'Последний размер'
-  return `<span class="badge badge--last">${escapeHtml(text)}</span>`
+  return `<div class="card__last"><span>${escapeHtml(text)}</span></div>`
 }
 
 // ----------------------------------------------------- общие блоки витрины
@@ -200,10 +200,10 @@ function productCard(product) {
           ${discount ? `<span class="badge">−${discount}%</span>` : ''}
           ${product.isHit ? '<span class="badge badge--hit">🔥 Хит</span>' : ''}
           ${product.isNew ? '<span class="badge badge--new">New</span>' : ''}
-          ${lastSizeBadgeHtml(product)}
           ${!product.inStock ? '<span class="badge badge--out">Раскуплено</span>' : ''}
         </div>
       </div>
+      ${lastSizeBadgeHtml(product)}
       <div class="card__name">${escapeHtml(product.name)}</div>
       <div class="card__price">
         ${money(product.price)}
