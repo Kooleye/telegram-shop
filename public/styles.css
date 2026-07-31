@@ -1111,3 +1111,38 @@ body {
   opacity: 0.85;
   letter-spacing: 0.01em;
 }
+
+/* ------------------------- текст в полях — в один тон с блоком «Оплачивать…» */
+
+.field input,
+.field textarea,
+.field input.input--phone,
+.field input.input--tag {
+  font-family: 'Cormorant Garamond', 'Playfair Display', 'Didot', 'Bodoni MT', 'Hoefler Text', Garamond,
+    Georgia, 'Times New Roman', 'Noto Serif', serif;
+  color: var(--text);
+  -webkit-text-fill-color: var(--text);
+  opacity: 1;
+}
+
+.field input.input--phone {
+  font-size: 19px;
+  letter-spacing: 0.06em;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.field input.input--tag {
+  font-size: 18px;
+  letter-spacing: 0.03em;
+}
+
+.field textarea {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: rgba(247, 241, 236, 0.45);
+  -webkit-text-fill-color: rgba(247, 241, 236, 0.45);
+}
