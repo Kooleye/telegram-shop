@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Админка магазина</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      body { background: #f9f8f7; }
+      .wrap { max-width: 960px; }
+      .panel {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+      .row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .row--between { justify-content: space-between; }
+      .tag {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #e5f2fc;
+        color: #1c6bb5;
+      }
+      .tag--done { background: #e8f1ec; color: #2f7a52; }
+      .tag--cancel { background: #fce9e7; color: #a33a30; }
+      .stock-input {
+        width: 64px;
+        padding: 8px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font: inherit;
+        text-align: center;
+      }
+      .tabs { display: flex; gap: 8px; margin: 24px 0 16px; }
+      .muted { color: var(--muted); font-size: 14px; }
+      .prod-row { display: flex; gap: 12px; align-items: flex-start; padding: 16px 0; border-top: 1px solid var(--border); }
+      .prod-row img { width: 56px; height: 74px; object-fit: cover; border-radius: 8px; }
+      @media (prefers-color-scheme: dark) {
+        body { background: #191919; }
+        .panel { background: #202020; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <h1 class="topbar__title">Админка</h1>
+      <a class="cart-link" href="/">Открыть витрину</a>
+    </header>
+    <main class="wrap" id="admin"></main>
+    <script src="/admin.js"></script>
+  </body>
+</html>

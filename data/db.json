@@ -1,0 +1,234 @@
+{
+  "shop": {
+    "name": "PAULEA",
+    "tagline": "Женская одежда с примеркой в магазине",
+    "currency": "₽",
+    "address": "г. Стерлитамак",
+    "workingHours": "ежедневно 10:00–21:00"
+  },
+  "orderCounter": 0,
+  "categories": [
+    {
+      "id": "hoodie",
+      "name": "Худи",
+      "sortOrder": 1,
+      "isActive": true
+    },
+    {
+      "id": "tshirt",
+      "name": "Футболки",
+      "sortOrder": 2,
+      "isActive": true
+    },
+    {
+      "id": "dress",
+      "name": "Платья",
+      "sortOrder": 3,
+      "isActive": true
+    },
+    {
+      "id": "jeans",
+      "name": "Джинсы",
+      "sortOrder": 4,
+      "isActive": true
+    },
+    {
+      "id": "outerwear",
+      "name": "Верхняя одежда",
+      "sortOrder": 5,
+      "isActive": true
+    },
+    {
+      "id": "skirt",
+      "name": "Юбки",
+      "sortOrder": 6,
+      "isActive": true
+    }
+  ],
+  "products": [
+    {
+      "id": "prd_hoodie_oversize",
+      "categoryId": "hoodie",
+      "name": "Худи oversize молочный",
+      "description": "Плотный футер с начёсом, свободный крой, двойной капюшон. Рост модели 175 см, на ней размер M.",
+      "composition": "80% хлопок, 20% полиэстер",
+      "price": 4890,
+      "oldPrice": 5900,
+      "images": [
+        "/photos/hoodie.jpg"
+      ],
+      "variants": [
+        {
+          "size": "S",
+          "stock": 2
+        },
+        {
+          "size": "M",
+          "stock": 1
+        },
+        {
+          "size": "L",
+          "stock": 0
+        }
+      ],
+      "isActive": true,
+      "isHit": true,
+      "isNew": false
+    },
+    {
+      "id": "prd_tshirt_basic",
+      "categoryId": "tshirt",
+      "name": "Футболка базовая белая",
+      "description": "Плотный трикотаж 190 г/м², не просвечивает. Прямой силуэт, круглый вырез.",
+      "composition": "100% хлопок",
+      "price": 1690,
+      "oldPrice": null,
+      "images": [
+        "/photos/tshirt.jpg"
+      ],
+      "variants": [
+        {
+          "size": "XS",
+          "stock": 3
+        },
+        {
+          "size": "S",
+          "stock": 4
+        },
+        {
+          "size": "M",
+          "stock": 2
+        },
+        {
+          "size": "L",
+          "stock": 1
+        }
+      ],
+      "isActive": true,
+      "isHit": false,
+      "isNew": false
+    },
+    {
+      "id": "prd_dress_midi",
+      "categoryId": "dress",
+      "name": "Платье миди шоколад",
+      "description": "Струящаяся ткань, пояс в комплекте, длина по середине икры. Подходит для офиса и ужина.",
+      "composition": "95% вискоза, 5% эластан",
+      "price": 6490,
+      "oldPrice": null,
+      "images": [
+        "/photos/dress.jpg"
+      ],
+      "variants": [
+        {
+          "size": "S",
+          "stock": 1
+        },
+        {
+          "size": "M",
+          "stock": 2
+        },
+        {
+          "size": "L",
+          "stock": 1
+        }
+      ],
+      "isActive": true,
+      "isHit": true,
+      "isNew": true
+    },
+    {
+      "id": "prd_jeans_straight",
+      "categoryId": "jeans",
+      "name": "Джинсы прямые синие",
+      "description": "Высокая посадка, плотный деним без стрейча, длина по щиколотку.",
+      "composition": "100% хлопок",
+      "price": 5290,
+      "oldPrice": 6490,
+      "images": [
+        "/photos/jeans.jpg"
+      ],
+      "variants": [
+        {
+          "size": "26",
+          "stock": 1
+        },
+        {
+          "size": "27",
+          "stock": 2
+        },
+        {
+          "size": "28",
+          "stock": 0
+        },
+        {
+          "size": "29",
+          "stock": 1
+        }
+      ],
+      "isActive": true,
+      "isHit": true,
+      "isNew": false
+    },
+    {
+      "id": "prd_coat_wool",
+      "categoryId": "outerwear",
+      "name": "Пальто шерстяное бежевое",
+      "description": "Прямой крой на подкладе, два кармана, длина ниже колена. Демисезон.",
+      "composition": "70% шерсть, 30% полиэстер",
+      "price": 12900,
+      "oldPrice": null,
+      "images": [
+        "/photos/coat.jpg"
+      ],
+      "variants": [
+        {
+          "size": "S",
+          "stock": 1
+        },
+        {
+          "size": "M",
+          "stock": 1
+        },
+        {
+          "size": "L",
+          "stock": 0
+        }
+      ],
+      "isActive": true,
+      "isHit": false,
+      "isNew": true
+    },
+    {
+      "id": "prd_skirt_pleated",
+      "categoryId": "skirt",
+      "name": "Юбка плиссе графит",
+      "description": "Мелкая складка, резинка на поясе, длина миди. Держит форму после стирки.",
+      "composition": "100% полиэстер",
+      "price": 3790,
+      "oldPrice": null,
+      "images": [
+        "/photos/skirt.jpg"
+      ],
+      "variants": [
+        {
+          "size": "S",
+          "stock": 2
+        },
+        {
+          "size": "M",
+          "stock": 2
+        },
+        {
+          "size": "L",
+          "stock": 1
+        }
+      ],
+      "isActive": true,
+      "isHit": false,
+      "isNew": true
+    }
+  ],
+  "orders": [],
+  "banners": []
+}
