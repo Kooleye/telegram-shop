@@ -375,7 +375,7 @@ const server = http.createServer(async (req, res) => {
           oldPrice: p.oldPrice ? Number(p.oldPrice) : null,
           images: Array.isArray(p.images) ? p.images.slice(0, 8) : [],
           variants: (Array.isArray(p.variants) ? p.variants : []).map((v) => ({
-            size: String(v.size).slice(0, 12),
+            size: String(v.size).slice(0, 24),
             stock: Math.max(0, Number(v.stock) || 0),
           })),
           isActive: p.isActive !== false,
@@ -389,6 +389,24 @@ const server = http.createServer(async (req, res) => {
 
         saveDb()
         return json(res, 200, { ok: true, product: clean })
+      }
+
+      // Загрузка фото товара: браузер присылает картинку в base64.
+      if (pathname === '/api/admin/photo-upload' && req.method === 'POST') {
+        const body = await readBody(req)
+        const match = String(body.dataUrl || '').match(/^data:image\/(png|jpeg|jpg|webp);base64,(.+)$/)
+        if (!match) return json(res, 400, { error: 'Подойдёт файл PNG, JPG или WebP' })
+
+        const ext = match[1] === 'jpeg' ? 'jpg' : match[1]
+        const buffer = Buffer.from(match[2], 'base64')
+        if (buffer.length > 8 * 1024 * 1024) return json(res, 400, { error: 'Файл больше 8 МБ' })
+
+        const dir = path.join(PUBLIC_DIR, 'photos')
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+
+        const fileName = nextId('img') + '.' + ext
+        fs.writeFileSync(path.join(dir, fileName), buffer)
+        return json(res, 200, { ok: true, image: '/photos/' + fileName })
       }
 
       // Загрузка баннера с акцией: браузер присылает картинку в base64.
@@ -436,6 +454,90 @@ const server = http.createServer(async (req, res) => {
         data.products = data.products.filter((p) => p.id !== body.id)
         saveDb()
         return json(res, 200, { ok: true })
+      }
+
+      // Создание или переименование категории.
+      if (pathname === '/api/admin/category' && req.method === 'POST') {
+        const body = await readBody(req)
+        const c = body.category
+        if (!c || !String(c.name || '').trim()) {
+          return json(res, 400, { error: 'Нужно название категории' })
+        }
+
+        const name = String(c.name).trim().slice(0, 60)
+        const existing = data.categories.find((x) => x.id === c.id)
+
+        if (existing) {
+          existing.name = name
+          if (c.isActive !== undefined) existing.isActive = c.isActive !== false
+        } else {
+          const maxOrder = data.categories.reduce((m, x) => Math.max(m, Number(x.sortOrder) || 0), 0)
+          data.categories.push({
+            id: nextId('cat'),
+            name,
+            sortOrder: maxOrder + 1,
+            isActive: c.isActive !== false,
+          })
+        }
+
+        saveDb()
+        return json(res, 200, { ok: true, categories: data.categories })
+      }
+
+      // Удаление категории. Если в ней есть товары, нужно сказать, что с ними делать:
+      // moveTo = id другой категории, или deleteProducts = true.
+      if (pathname === '/api/admin/category-delete' && req.method === 'POST') {
+        const body = await readBody(req)
+        const category = data.categories.find((c) => c.id === body.id)
+        if (!category) return json(res, 404, { error: 'Категория не найдена' })
+        if (data.categories.length <= 1) {
+          return json(res, 400, { error: 'Нужна хотя бы одна категория' })
+        }
+
+        const inside = data.products.filter((p) => p.categoryId === body.id)
+        if (inside.length && !body.moveTo && body.deleteProducts !== true) {
+          return json(res, 409, {
+            error: 'В категории есть товары',
+            productCount: inside.length,
+          })
+        }
+
+        if (inside.length && body.deleteProducts === true) {
+          data.products = data.products.filter((p) => p.categoryId !== body.id)
+        } else if (inside.length) {
+          const target = data.categories.find((c) => c.id === body.moveTo)
+          if (!target) return json(res, 400, { error: 'Куда перенести товары?' })
+          for (const product of data.products) {
+            if (product.categoryId === body.id) product.categoryId = target.id
+          }
+        }
+
+        data.categories = data.categories.filter((c) => c.id !== body.id)
+        saveDb()
+        return json(res, 200, { ok: true, categories: data.categories })
+      }
+
+      // Порядок категорий в витрине: выше / ниже.
+      if (pathname === '/api/admin/category-move' && req.method === 'POST') {
+        const body = await readBody(req)
+        const sorted = data.categories
+          .slice()
+          .sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0))
+        const index = sorted.findIndex((c) => c.id === body.id)
+        if (index === -1) return json(res, 404, { error: 'Категория не найдена' })
+
+        const target = body.direction === 'up' ? index - 1 : index + 1
+        if (target >= 0 && target < sorted.length) {
+          const tmp = sorted[index]
+          sorted[index] = sorted[target]
+          sorted[target] = tmp
+        }
+        sorted.forEach((c, i) => {
+          c.sortOrder = i + 1
+        })
+        data.categories = sorted
+        saveDb()
+        return json(res, 200, { ok: true, categories: data.categories })
       }
 
       return json(res, 404, { error: 'Неизвестный метод' })

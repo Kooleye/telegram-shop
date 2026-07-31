@@ -284,17 +284,41 @@ function renderProduct(productId) {
     state.selectedSize = null
   }
 
+  // Сумки и аксессуары: размер один, выбор не показываем.
+  const oneSize = product.variants.length === 1 && product.variants[0].size === 'Один размер'
+  if (oneSize && available.length) state.selectedSize = product.variants[0].size
+
   const discount = discountOf(product)
 
+  const images = product.images && product.images.length ? product.images : ['/photos/placeholder.svg']
+  state.images = images
+
   app.innerHTML = `
-    <div class="product__media">
-      <img src="${escapeHtml(imageOf(product))}" alt="${escapeHtml(product.name)}" />
+    <div class="gallery">
+      <div class="gallery__track" id="galleryTrack">
+        ${images
+          .map(
+            (src, i) => `
+              <div class="gallery__slide">
+                <img src="${escapeHtml(src)}" alt="${escapeHtml(product.name)}" data-zoom="${i}" />
+              </div>`,
+          )
+          .join('')}
+      </div>
       <div class="badges">
         ${discount ? `<span class="badge">−${discount}%</span>` : ''}
         ${product.isHit ? '<span class="badge badge--hit">🔥 Хит</span>' : ''}
         ${product.isNew ? '<span class="badge badge--new">New</span>' : ''}
       </div>
+      ${images.length > 1 ? `<div class="gallery__count" id="galleryCount">1 / ${images.length}</div>` : ''}
     </div>
+    ${
+      images.length > 1
+        ? `<div class="dots" id="galleryDots">${images
+            .map((_, i) => `<span class="dot ${i === 0 ? 'dot--active' : ''}"></span>`)
+            .join('')}</div>`
+        : ''
+    }
 
     <h2 class="product__title">${escapeHtml(product.name)}</h2>
     <div class="product__price">
@@ -302,8 +326,12 @@ function renderProduct(productId) {
       ${product.oldPrice ? `<span class="product__old">${money(product.oldPrice)}</span>` : ''}
     </div>
 
-    <div class="label">Размер</div>
-    <div class="sizes" id="sizes">${sizeButtonsHtml(product)}</div>
+    ${
+      oneSize
+        ? ''
+        : `<div class="label">Размер</div>
+           <div class="sizes" id="sizes">${sizeButtonsHtml(product)}</div>`
+    }
 
     <div id="addWrap">
       ${
@@ -313,10 +341,94 @@ function renderProduct(productId) {
       }
     </div>
 
-    <div class="info">
-      <p>${escapeHtml(product.description)}</p>
-      <p class="info__meta">Состав: ${escapeHtml(product.composition)}</p>
-    </div>`
+    ${
+      product.description
+        ? `<div class="desc">
+             <div class="desc__title">Описание</div>
+             <p>${escapeHtml(product.description)}</p>
+           </div>`
+        : ''
+    }
+
+    ${
+      product.composition
+        ? `<div class="compo">
+             <span class="compo__label">Состав</span>
+             <span class="compo__value">${escapeHtml(product.composition)}</span>
+           </div>`
+        : ''
+    }`
+
+  setupGallery()
+}
+
+/** Счётчик и точки под галереей товара. */
+function setupGallery() {
+  const track = document.getElementById('galleryTrack')
+  if (!track) return
+  const count = document.getElementById('galleryCount')
+  const dots = document.getElementById('galleryDots')
+
+  track.addEventListener('scroll', () => {
+    const index = Math.round(track.scrollLeft / track.clientWidth)
+    if (count) count.textContent = index + 1 + ' / ' + state.images.length
+    if (dots) {
+      Array.from(dots.children).forEach((dot, i) => {
+        dot.classList.toggle('dot--active', i === index)
+      })
+    }
+  })
+}
+
+/** Полноэкранный просмотр: листание свайпом, тап — приблизить. */
+function openLightbox(startIndex) {
+  const images = state.images || []
+  if (!images.length) return
+
+  const box = document.createElement('div')
+  box.className = 'lb'
+  box.innerHTML = `
+    <button class="lb__close" type="button" aria-label="Закрыть">✕</button>
+    <div class="lb__count">${startIndex + 1} / ${images.length}</div>
+    <div class="lb__track">
+      ${images
+        .map(
+          (src) => `
+            <div class="lb__slide">
+              <img class="lb__img" src="${escapeHtml(src)}" alt="" />
+            </div>`,
+        )
+        .join('')}
+    </div>
+    <div class="lb__hint">Листайте влево и вправо · нажмите на фото, чтобы приблизить</div>`
+
+  document.body.appendChild(box)
+  document.body.classList.add('no-scroll')
+
+  const track = box.querySelector('.lb__track')
+  const counter = box.querySelector('.lb__count')
+  track.scrollLeft = startIndex * track.clientWidth
+
+  track.addEventListener('scroll', () => {
+    const index = Math.round(track.scrollLeft / track.clientWidth)
+    counter.textContent = index + 1 + ' / ' + images.length
+  })
+
+  const close = () => {
+    box.remove()
+    document.body.classList.remove('no-scroll')
+  }
+
+  box.querySelector('.lb__close').addEventListener('click', close)
+
+  box.addEventListener('click', (event) => {
+    const img = event.target.closest('.lb__img')
+    if (img) {
+      img.classList.toggle('lb__img--zoom')
+      return
+    }
+    if (event.target.closest('.lb__slide')) close()
+  })
 }
 
 function addButtonHtml() {
@@ -489,9 +601,13 @@ async function sendOrder() {
 
 app.addEventListener('click', (event) => {
   const target = event.target.closest(
-    '[data-open], [data-nav], [data-cat], [data-size], [data-remove], [data-go], #addBtn, #sendBtn',
+    '[data-open], [data-nav], [data-cat], [data-size], [data-remove], [data-go], [data-zoom], #addBtn, #sendBtn',
   )
   if (!target) return
+
+  if (target.dataset.zoom !== undefined && target.dataset.zoom !== '') {
+    return openLightbox(Number(target.dataset.zoom))
+  }
 
   if (target.dataset.nav) return go(target.dataset.nav)
   if (target.dataset.cat) return go('/c/' + target.dataset.cat)
