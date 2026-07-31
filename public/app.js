@@ -389,15 +389,36 @@ function setupGallery() {
   const count = document.getElementById('galleryCount')
   const dots = document.getElementById('galleryDots')
 
+  let galleryTimer = null
+
+  const galleryIndex = () =>
+    Math.max(
+      0,
+      Math.min(state.images.length - 1, Math.round(track.scrollLeft / track.clientWidth)),
+    )
+
+  // Тот же доводчик в карточке товара
+  const settleGallery = () => {
+    const target = galleryIndex() * track.clientWidth
+    if (Math.abs(track.scrollLeft - target) > 1) {
+      track.scrollTo({ left: target, behavior: 'smooth' })
+    }
+  }
+
   track.addEventListener('scroll', () => {
-    const index = Math.round(track.scrollLeft / track.clientWidth)
+    const index = galleryIndex()
     if (count) count.textContent = index + 1 + ' / ' + state.images.length
     if (dots) {
       Array.from(dots.children).forEach((dot, i) => {
         dot.classList.toggle('dot--active', i === index)
       })
     }
+    if (galleryTimer) clearTimeout(galleryTimer)
+    galleryTimer = setTimeout(settleGallery, 140)
   })
+
+  track.addEventListener('scrollend', settleGallery)
+  track.addEventListener('touchend', () => setTimeout(settleGallery, 80), { passive: true })
 }
 
 /** Полноэкранный просмотр: листание свайпом, тап — приблизить. */
@@ -446,23 +467,43 @@ function openLightbox(startIndex) {
   track.scrollLeft = startIndex * track.clientWidth
 
   let settleTimer = null
+  let hardSnapTimer = null
+  let touching = false
 
   const currentIndex = () =>
     Math.max(0, Math.min(images.length - 1, Math.round(track.scrollLeft / track.clientWidth)))
 
-  // Возвращает фото ровно на место, если свайп остановился между кадрами
+  // Доводчик в полноэкранном режиме: если лента встала между кадрами
+  // или её потянули за последнее фото — возвращаем снимок ровно на место
   const settle = () => {
+    if (touching) return
     const target = currentIndex() * track.clientWidth
     if (Math.abs(track.scrollLeft - target) > 1) {
       track.scrollTo({ left: target, behavior: 'smooth' })
     }
+    // если плавная доводка не дошла до конца — ставим точно
+    if (hardSnapTimer) clearTimeout(hardSnapTimer)
+    hardSnapTimer = setTimeout(() => {
+      if (touching) return
+      const exact = currentIndex() * track.clientWidth
+      if (Math.abs(track.scrollLeft - exact) > 1) track.scrollLeft = exact
+    }, 420)
+  }
+
+  const scheduleSettle = (delay) => {
+    if (settleTimer) clearTimeout(settleTimer)
+    settleTimer = setTimeout(settle, delay)
   }
 
   track.addEventListener('scroll', () => {
     if (number) number.textContent = pad(currentIndex() + 1)
-    if (settleTimer) clearTimeout(settleTimer)
-    settleTimer = setTimeout(settle, 140)
+    scheduleSettle(touching ? 260 : 110)
   })
+
+  // в новых браузерах событие окончания прокрутки точнее таймера
+  track.addEventListener('scrollend', settle)
+
+  window.addEventListener('orientationchange', () => scheduleSettle(200))
 
   const close = () => {
     box.remove()
@@ -479,16 +520,32 @@ function openLightbox(startIndex) {
 
   const goTo = (index) => {
     const safe = Math.max(0, Math.min(images.length - 1, index))
-    track.scrollTo({ left: safe * track.clientWidth, behavior: 'smooth' })
+    const target = safe * track.clientWidth
+    track.scrollTo({ left: target, behavior: 'smooth' })
     if (number) number.textContent = pad(safe + 1)
+    if (hardSnapTimer) clearTimeout(hardSnapTimer)
+    hardSnapTimer = setTimeout(() => {
+      if (!touching && Math.abs(track.scrollLeft - target) > 1) track.scrollLeft = target
+    }, 420)
   }
 
   track.addEventListener(
     'touchstart',
     (event) => {
+      touching = true
       multi = event.touches.length > 1
       startX = event.touches[0].clientX
       startY = event.touches[0].clientY
+    },
+    { passive: true },
+  )
+
+  track.addEventListener(
+    'touchcancel',
+    () => {
+      touching = false
+      startX = null
+      scheduleSettle(60)
     },
     { passive: true },
   )
@@ -504,9 +561,10 @@ function openLightbox(startIndex) {
   track.addEventListener(
     'touchend',
     (event) => {
+      touching = false
       if (multi || startX === null) {
         startX = null
-        return settle()
+        return scheduleSettle(60)
       }
       const touch = event.changedTouches[0]
       const dx = touch.clientX - startX
