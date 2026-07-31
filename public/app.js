@@ -389,36 +389,16 @@ function setupGallery() {
   const count = document.getElementById('galleryCount')
   const dots = document.getElementById('galleryDots')
 
-  let galleryTimer = null
-
-  const galleryIndex = () =>
-    Math.max(
-      0,
-      Math.min(state.images.length - 1, Math.round(track.scrollLeft / track.clientWidth)),
-    )
-
-  // Тот же доводчик в карточке товара
-  const settleGallery = () => {
-    const target = galleryIndex() * track.clientWidth
-    if (Math.abs(track.scrollLeft - target) > 1) {
-      track.scrollTo({ left: target, behavior: 'smooth' })
-    }
-  }
-
+  // Листание полностью нативное — только обновляем счётчик и точки
   track.addEventListener('scroll', () => {
-    const index = galleryIndex()
+    const index = Math.round(track.scrollLeft / track.clientWidth)
     if (count) count.textContent = index + 1 + ' / ' + state.images.length
     if (dots) {
       Array.from(dots.children).forEach((dot, i) => {
         dot.classList.toggle('dot--active', i === index)
       })
     }
-    if (galleryTimer) clearTimeout(galleryTimer)
-    galleryTimer = setTimeout(settleGallery, 140)
   })
-
-  track.addEventListener('scrollend', settleGallery)
-  track.addEventListener('touchend', () => setTimeout(settleGallery, 80), { passive: true })
 }
 
 /** Полноэкранный просмотр: листание свайпом, тап — приблизить. */
@@ -466,44 +446,24 @@ function openLightbox(startIndex) {
   const number = box.querySelector('.lb__num')
   track.scrollLeft = startIndex * track.clientWidth
 
-  let settleTimer = null
-  let hardSnapTimer = null
-  let touching = false
-
   const currentIndex = () =>
     Math.max(0, Math.min(images.length - 1, Math.round(track.scrollLeft / track.clientWidth)))
 
-  // Доводчик в полноэкранном режиме: если лента встала между кадрами
-  // или её потянули за последнее фото — возвращаем снимок ровно на место
-  const settle = () => {
-    if (touching) return
-    const target = currentIndex() * track.clientWidth
-    if (Math.abs(track.scrollLeft - target) > 1) {
-      track.scrollTo({ left: target, behavior: 'smooth' })
+  // Доводчик только для краёв: если ленту потянули дальше последнего
+  // (или перед первым) фото — возвращаем кадр на место.
+  // Обычное листание между кадрами остаётся нативным и легким.
+  const settleEdge = () => {
+    const max = (images.length - 1) * track.clientWidth
+    if (track.scrollLeft > max + 1) {
+      track.scrollTo({ left: max, behavior: 'smooth' })
+    } else if (track.scrollLeft < -1) {
+      track.scrollTo({ left: 0, behavior: 'smooth' })
     }
-    // если плавная доводка не дошла до конца — ставим точно
-    if (hardSnapTimer) clearTimeout(hardSnapTimer)
-    hardSnapTimer = setTimeout(() => {
-      if (touching) return
-      const exact = currentIndex() * track.clientWidth
-      if (Math.abs(track.scrollLeft - exact) > 1) track.scrollLeft = exact
-    }, 420)
-  }
-
-  const scheduleSettle = (delay) => {
-    if (settleTimer) clearTimeout(settleTimer)
-    settleTimer = setTimeout(settle, delay)
   }
 
   track.addEventListener('scroll', () => {
     if (number) number.textContent = pad(currentIndex() + 1)
-    scheduleSettle(touching ? 260 : 110)
   })
-
-  // в новых браузерах событие окончания прокрутки точнее таймера
-  track.addEventListener('scrollend', settle)
-
-  window.addEventListener('orientationchange', () => scheduleSettle(200))
 
   const close = () => {
     box.remove()
@@ -520,19 +480,13 @@ function openLightbox(startIndex) {
 
   const goTo = (index) => {
     const safe = Math.max(0, Math.min(images.length - 1, index))
-    const target = safe * track.clientWidth
-    track.scrollTo({ left: target, behavior: 'smooth' })
+    track.scrollTo({ left: safe * track.clientWidth, behavior: 'smooth' })
     if (number) number.textContent = pad(safe + 1)
-    if (hardSnapTimer) clearTimeout(hardSnapTimer)
-    hardSnapTimer = setTimeout(() => {
-      if (!touching && Math.abs(track.scrollLeft - target) > 1) track.scrollLeft = target
-    }, 420)
   }
 
   track.addEventListener(
     'touchstart',
     (event) => {
-      touching = true
       multi = event.touches.length > 1
       startX = event.touches[0].clientX
       startY = event.touches[0].clientY
@@ -543,9 +497,8 @@ function openLightbox(startIndex) {
   track.addEventListener(
     'touchcancel',
     () => {
-      touching = false
       startX = null
-      scheduleSettle(60)
+      setTimeout(settleEdge, 80)
     },
     { passive: true },
   )
@@ -561,17 +514,20 @@ function openLightbox(startIndex) {
   track.addEventListener(
     'touchend',
     (event) => {
-      touching = false
       if (multi || startX === null) {
         startX = null
-        return scheduleSettle(60)
+        return setTimeout(settleEdge, 80)
       }
       const touch = event.changedTouches[0]
       const dx = touch.clientX - startX
       const dy = touch.clientY - startY
       startX = null
       const current = currentIndex()
-      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return goTo(current)
+      const atEdge =
+        (dx < 0 && current === images.length - 1) || (dx > 0 && current === 0)
+      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) || atEdge) {
+        return setTimeout(settleEdge, 60)
+      }
       goTo(dx < 0 ? current + 1 : current - 1)
     },
     { passive: true },
