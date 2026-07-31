@@ -44,6 +44,40 @@ function readFileAsDataUrl(file) {
   })
 }
 
+// Золотое правило витрины: любое фото товара приводим к 3:4 (900×1200).
+// Кадрируем по центру по ширине и от верха по высоте — голова модели не срезается.
+function cropTo34(dataUrl) {
+  return new Promise((resolve) => {
+    const image = new Image()
+    image.onload = () => {
+      const W = 900
+      const H = 1200
+      const canvas = document.createElement('canvas')
+      canvas.width = W
+      canvas.height = H
+      const ctx = canvas.getContext('2d')
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(0, 0, W, H)
+
+      const scale = Math.max(W / image.width, H / image.height)
+      const drawWidth = image.width * scale
+      const drawHeight = image.height * scale
+      const dx = (W - drawWidth) / 2
+      const dy = drawHeight > H ? 0 : (H - drawHeight) / 2
+
+      ctx.imageSmoothingQuality = 'high'
+      ctx.drawImage(image, dx, dy, drawWidth, drawHeight)
+      resolve(canvas.toDataURL('image/jpeg', 0.86))
+    }
+    image.onerror = () => resolve(dataUrl)
+    image.src = dataUrl
+  })
+}
+
+async function readPhotoAs34(file) {
+  return cropTo34(await readFileAsDataUrl(file))
+}
+
 // --------------------------------------------------------------------- вход
 
 function renderLogin(message) {
@@ -758,8 +792,8 @@ root.addEventListener('change', async (event) => {
         status.textContent = 'Максимум ' + MAX_IMAGES + ' фото на карточку — остальные не добавил.'
         break
       }
-      status.textContent = 'Загружаем фото ' + (i + 1) + ' из ' + chosen.length + '…'
-      const result = await api('/api/admin/photo-upload', { dataUrl: await readFileAsDataUrl(chosen[i]) })
+      status.textContent = 'Готовим фото ' + (i + 1) + ' из ' + chosen.length + ' в формате 3:4…'
+      const result = await api('/api/admin/photo-upload', { dataUrl: await readPhotoAs34(chosen[i]) })
       if (result.error) {
         status.textContent = result.error
         return

@@ -1314,3 +1314,34 @@ body {
 .card__last::after {
   content: none;
 }
+
+/* ---------------- золотое правило: все фото в формате 3:4 */
+
+.card__media,
+.gallery__slide {
+  aspect-ratio: 3 / 4;
+}
+
+.card__media img,
+.gallery__slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* во весь экран тоже один кадр для всех снимков */
+.lb__slide {
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.lb__img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  max-width: min(100%, calc((100vh - 150px) * 0.75));
+  max-height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 2px;
+}
