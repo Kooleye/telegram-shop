@@ -9,6 +9,8 @@ const state = {
   selectedSize: null,
   sending: false,
   error: '',
+  sort: 'new',
+  sortOpen: false,
 }
 
 const app = document.getElementById('app')
@@ -258,17 +260,64 @@ function renderCatalogList() {
     ${footerHtml()}`
 }
 
+// ---------------------------------------------------------------- сортировка
+
+const SORTS = [
+  { id: 'new', label: 'Сначала новинки' },
+  { id: 'price_asc', label: 'Сначала дешевле' },
+  { id: 'price_desc', label: 'Сначала дороже' },
+  { id: 'hit', label: 'Сначала хиты' },
+]
+
+function currentSort() {
+  return SORTS.find((s) => s.id === state.sort) || SORTS[0]
+}
+
+/** Возвращает новый отсортированный массив, не трогая исходный. */
+function sortProducts(list) {
+  const items = list.slice()
+  const price = (p) => Number(p.price) || 0
+
+  if (state.sort === 'price_asc') items.sort((a, b) => price(a) - price(b))
+  else if (state.sort === 'price_desc') items.sort((a, b) => price(b) - price(a))
+  else if (state.sort === 'hit') items.sort((a, b) => Number(!!b.isHit) - Number(!!a.isHit))
+  else items.sort((a, b) => Number(!!b.isNew) - Number(!!a.isNew))
+
+  return items
+}
+
+/** Кнопка сортировки и её выпадающее меню. */
+function sortHtml() {
+  return `
+    <div class="sort">
+      <button class="sort__btn ${state.sortOpen ? 'sort__btn--open' : ''}" data-sort-toggle="1">
+        <span class="sort__label">${escapeHtml(currentSort().label)}</span>
+        <span class="sort__caret">⌄</span>
+      </button>
+      ${
+        state.sortOpen
+          ? `<div class="sort__menu">
+              ${SORTS.map(
+                (s) =>
+                  `<button class="sort__item ${s.id === state.sort ? 'sort__item--active' : ''}" data-sort="${s.id}">${escapeHtml(s.label)}</button>`,
+              ).join('')}
+            </div>`
+          : ''
+      }
+    </div>`
+}
+
 /** Товары одной категории. */
 function renderCategory(categoryId) {
   const { categories, products } = state.catalog
   const category = categories.find((c) => c.id === categoryId)
-  const list = products.filter((p) => p.categoryId === categoryId)
+  const list = sortProducts(products.filter((p) => p.categoryId === categoryId))
 
   app.innerHTML = `
     ${navHtml('catalog')}
-    <div class="toolbar">
+    <div class="toolbar toolbar--sort">
       <h2 class="toolbar__title">${escapeHtml(category ? category.name : 'Каталог')}</h2>
-      <button class="filter-btn" data-nav="/catalog">Все категории</button>
+      ${sortHtml()}
     </div>
     ${gridHtml(list, 'В этой категории пока пусто')}
     ${footerHtml()}`
@@ -908,9 +957,22 @@ async function sendOrder() {
 
 app.addEventListener('click', (event) => {
   const target = event.target.closest(
-    '[data-open], [data-nav], [data-cat], [data-size], [data-remove], [data-go], [data-zoom], #addBtn, #sendBtn',
+    '[data-open], [data-nav], [data-cat], [data-size], [data-remove], [data-go], [data-zoom], [data-sort], [data-sort-toggle], #addBtn, #sendBtn',
   )
   if (!target) return
+
+  if (target.dataset.sortToggle) {
+    state.sortOpen = !state.sortOpen
+    return render()
+  }
+  if (target.dataset.sort) {
+    state.sort = target.dataset.sort
+    state.sortOpen = false
+    try {
+      localStorage.setItem('sort', state.sort)
+    } catch {}
+    return render()
+  }
 
   if (target.dataset.zoom !== undefined && target.dataset.zoom !== '') {
     return openLightbox(Number(target.dataset.zoom))
@@ -945,6 +1007,14 @@ shopName.addEventListener('click', () => {
   }
 })
 
+// Клик мимо меню сортировки его закрывает.
+document.addEventListener('click', (event) => {
+  if (!state.sortOpen) return
+  if (event.target.closest('.sort')) return
+  state.sortOpen = false
+  render()
+})
+
 backBtn.addEventListener('click', () => history.back())
 cartBtn.addEventListener('click', () => go('/cart'))
 window.addEventListener('hashchange', render)
@@ -954,6 +1024,11 @@ window.addEventListener('hashchange', render)
 async function init() {
   setupTelegram(await waitForTelegram())
   if (tg && tg.BackButton) tg.BackButton.onClick(() => history.back())
+
+  try {
+    const savedSort = localStorage.getItem('sort')
+    if (savedSort && SORTS.some((s) => s.id === savedSort)) state.sort = savedSort
+  } catch {}
 
   loadCart()
   renderCartCount()
