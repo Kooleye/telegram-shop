@@ -1,6 +1,8 @@
 :root {
   --bg: #661624;
   --bg-deep: #3c0e1b;
+  --pastel: #f3ebe6;
+  --pastel-strong: #ffffff;
   --surface: rgba(255, 255, 255, 0.06);
   --surface-strong: rgba(255, 255, 255, 0.1);
   --text: #f7f1ec;
@@ -468,8 +470,8 @@ button {
 }
 
 .size--active {
-  border-color: var(--gold);
-  background: var(--gold);
+  border-color: var(--pastel);
+  background: var(--pastel);
   color: #43101e;
   font-weight: 600;
 }
@@ -612,7 +614,7 @@ button {
   min-height: 52px;
   border: none;
   border-radius: var(--radius);
-  background: var(--gold);
+  background: var(--pastel);
   color: #43101e;
   font-size: 14px;
   font-weight: 700;
