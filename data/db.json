@@ -3,12 +3,14 @@
     "name": "PAULEA",
     "tagline": "Женская одежда с примеркой в магазине",
     "currency": "₽",
-    "address": "г. Стерлитамак",
-    "workingHours": "ежедневно 10:00–21:00",
+    "address": "г. Стерлитамак, ул. Октября 95",
+    "workingHours": "Ежедневно с 12:00 до 20:00",
     "lastSizeBadge": {
       "enabled": true,
       "text": "Последний размер"
-    }
+    },
+    "delivery": "Доставка по всей России",
+    "contactTelegram": "@aaniiloop3"
   },
   "orderCounter": 0,
   "categories": [

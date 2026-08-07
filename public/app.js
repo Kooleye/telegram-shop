@@ -52,7 +52,7 @@ function setupTelegram(webApp) {
   if (typeof tg.setHeaderColor === 'function') {
     try {
       tg.setHeaderColor('#3c0e1b')
-      tg.setBackgroundColor('#4a1222')
+      tg.setBackgroundColor('#661624')
     } catch {}
   }
 }
@@ -178,11 +178,26 @@ function navHtml(active) {
 
 function footerHtml() {
   const { shop } = state.catalog
-  return `
-    <div class="footer">
-      ${escapeHtml(shop.address)}<br />
-      ${escapeHtml(shop.workingHours)}
-    </div>`
+  const tg = String(shop.contactTelegram || '').trim()
+  const tgUser = tg.replace(/^@+/, '')
+  const tgHref = 'ht' + 'tps://t.me/' + encodeURIComponent(tgUser)
+  const rows = [
+    shop.address
+      ? `<div class="footer__row"><span class="footer__ic">◇</span><span>${escapeHtml(shop.address)}</span></div>`
+      : '',
+    shop.workingHours
+      ? `<div class="footer__row"><span class="footer__ic">○</span><span>${escapeHtml(shop.workingHours)}</span></div>`
+      : '',
+    shop.delivery
+      ? `<div class="footer__row"><span class="footer__ic">→</span><span>${escapeHtml(shop.delivery)}</span></div>`
+      : '',
+    tg
+      ? `<div class="footer__row"><span class="footer__ic">✉</span><span>Telegram для связи: <a class="footer__tg" href="${escapeHtml(tgHref)}" target="_blank" rel="noopener">@${escapeHtml(tgUser)}</a></span></div>`
+      : '',
+  ]
+    .filter(Boolean)
+    .join('')
+  return `<div class="footer">${rows}</div>`
 }
 
 function sectionTitle(text) {
