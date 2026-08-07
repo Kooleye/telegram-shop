@@ -74,7 +74,7 @@ button {
   padding: 2px 0 6px;
   width: 100%;
   text-align: center;
-  font-family: 'Princess Diana', 'Diana the Princess', 'Pinyon Script', 'Parisienne', 'Great Vibes', cursive;
+  font-family: 'Pinyon Script', 'Parisienne', 'Great Vibes', 'Snell Roundhand', 'Apple Chancery', cursive;
   font-size: 30px;
   line-height: 1.1;
   font-weight: 400;
@@ -943,7 +943,8 @@ body.no-scroll {
   flex: 0 0 auto;
   text-align: center;
   padding: 6px 16px calc(8px + env(safe-area-inset-bottom));
-  color: rgba(240, 211, 166, 0.8);
+  color: #fffcef;
+  font-family: 'Montserrat', 'Helvetica Neue', Arial, 'Segoe UI', Roboto, sans-serif;
   font-size: 14px;
   line-height: 1.2;
   font-style: italic;
@@ -959,10 +960,10 @@ body.no-scroll {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 1px solid rgba(230, 192, 138, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   background: rgba(23, 6, 12, 0.55);
   backdrop-filter: blur(6px);
-  color: var(--gold-strong);
+  color: #ffffff;
   font-size: 16px;
   line-height: 1;
 }
@@ -971,23 +972,24 @@ body.no-scroll {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: var(--gold-strong);
+  color: #fffcef;
+  font-family: 'Montserrat', 'Helvetica Neue', Arial, 'Segoe UI', Roboto, sans-serif;
   font-size: 16px;
   letter-spacing: 0.24em;
 }
 
 .lb__num {
-  color: var(--gold-strong);
+  color: #fffcef;
 }
 
 .lb__sep {
   width: 26px;
   height: 1px;
-  background: rgba(240, 211, 166, 0.85);
+  background: #fffcef;
 }
 
 .lb__total {
-  color: rgba(240, 211, 166, 0.8);
+  color: #fffcef;
 }
 
 /* ------------------------------------------------- описание и состав */
