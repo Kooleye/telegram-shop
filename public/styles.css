@@ -5,14 +5,14 @@
   --pastel-strong: #ffffff;
   --surface: rgba(255, 255, 255, 0.06);
   --surface-strong: rgba(255, 255, 255, 0.1);
-  --text: #f7f1ec;
-  --muted: #efd8dd;
+  --text: #fffcef;
+  --muted: #fffcef;
   --border: rgba(255, 255, 255, 0.28);
   --gold: #e6c08a;
   --gold-strong: #f0d3a6;
   --sale: #ff7a6b;
-  --price: #f3ece8;
-  --sans: 'Helvetica Neue', Helvetica, Arial, 'Segoe UI', Roboto, sans-serif;
+  --price: #fffcef;
+  --sans: 'Montserrat', 'Helvetica Neue', Helvetica, Arial, 'Segoe UI', Roboto, sans-serif;
   --radius: 2px;
 }
 
@@ -30,8 +30,7 @@ body {
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Cormorant Garamond', 'Playfair Display', 'Didot', 'Bodoni MT', 'Hoefler Text', Garamond,
-    Georgia, 'Times New Roman', 'Noto Serif', serif;
+  font-family: 'Montserrat', 'Helvetica Neue', Arial, 'Segoe UI', Roboto, sans-serif;
   font-size: 15px;
   line-height: 1.5;
   padding-bottom: 96px;
@@ -75,7 +74,7 @@ button {
   padding: 2px 0 6px;
   width: 100%;
   text-align: center;
-  font-family: 'Pinyon Script', 'Parisienne', 'Great Vibes', 'Snell Roundhand', 'Apple Chancery', cursive;
+  font-family: 'Princess Diana', 'Diana the Princess', 'Pinyon Script', 'Parisienne', 'Great Vibes', cursive;
   font-size: 30px;
   line-height: 1.1;
   font-weight: 400;
@@ -734,16 +733,16 @@ button {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: none;
-  color: var(--text);
+  color: #ffffff;
   font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 .nav__btn--active {
-  background: var(--gold);
-  border-color: var(--gold);
-  color: #43101e;
+  background: #fffcef;
+  border-color: #fffcef;
+  color: #661624;
   font-weight: 700;
 }
 
@@ -1089,7 +1088,7 @@ body {
 }
 
 .total span {
-  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
   font-size: 19px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -1149,8 +1148,7 @@ body {
 .field textarea,
 .field input.input--phone,
 .field input.input--tag {
-  font-family: 'Cormorant Garamond', 'Playfair Display', 'Didot', 'Bodoni MT', 'Hoefler Text', Garamond,
-    Georgia, 'Times New Roman', 'Noto Serif', serif;
+  font-family: 'Montserrat', 'Helvetica Neue', Arial, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
   -webkit-text-fill-color: var(--text);
   opacity: 1;
@@ -1425,8 +1423,7 @@ body {
 
 /* имя — тем же тоном и шрифтом, что весь текст корзины */
 .field input.input--name {
-  font-family: 'Cormorant Garamond', 'Playfair Display', 'Didot', 'Bodoni MT', 'Hoefler Text', Garamond,
-    Georgia, 'Times New Roman', 'Noto Serif', serif;
+  font-family: 'Montserrat', 'Helvetica Neue', Arial, 'Segoe UI', Roboto, sans-serif;
   font-size: 18px;
   font-weight: 400;
   letter-spacing: 0.015em;
@@ -1460,8 +1457,7 @@ body {
   border-radius: 999px;
   background: none;
   color: var(--text);
-  font-family: 'Cormorant Garamond', 'Playfair Display', 'Didot', 'Bodoni MT', 'Hoefler Text',
-    Garamond, Georgia, 'Times New Roman', 'Noto Serif', serif;
+  font-family: 'Montserrat', 'Helvetica Neue', Arial, 'Segoe UI', Roboto, sans-serif;
   font-size: 15px;
   letter-spacing: 0.06em;
   line-height: 1.1;
@@ -1511,8 +1507,7 @@ body {
   background: none;
   color: var(--text);
   text-align: left;
-  font-family: 'Cormorant Garamond', 'Playfair Display', 'Didot', 'Bodoni MT', 'Hoefler Text',
-    Garamond, Georgia, 'Times New Roman', 'Noto Serif', serif;
+  font-family: 'Montserrat', 'Helvetica Neue', Arial, 'Segoe UI', Roboto, sans-serif;
   font-size: 16px;
   letter-spacing: 0.05em;
   cursor: pointer;
@@ -1524,4 +1519,41 @@ body {
 
 .sort__item--active {
   color: var(--gold-strong);
+}
+
+
+/* === v31: edinyj shrift Montserrat + cvet #fffcef === */
+.card__price,
+.card__old,
+.product__price,
+.product__old,
+.card__name,
+.product__title,
+.line__name,
+.line__meta,
+.total,
+.total span,
+.total b,
+.info__meta,
+.field label,
+.field__hint,
+.desc__title,
+.desc p,
+.compo__label,
+.compo__value,
+.cat__name,
+.cat__count,
+.cat__arrow,
+.footer,
+.footer__ic,
+.footer__tg,
+.drawer__item,
+.drawer__item--active,
+.filter-btn,
+.filter-btn--active,
+.sort__btn,
+.sort__btn--open,
+.sort__item,
+.sort__item--active {
+  color: #fffcef;
 }

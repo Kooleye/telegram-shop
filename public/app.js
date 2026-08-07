@@ -19,6 +19,14 @@ const cartBtn = document.getElementById('cartBtn')
 const cartCount = document.getElementById('cartCount')
 const shopName = document.getElementById('shopName')
 
+// Shrift logotipa Princess Diana (webfont). URL bez shemy, chtoby ne lomalos'.
+;(function loadLogoFont() {
+  var link = document.createElement('link')
+  link.rel = 'stylesheet'
+  link.href = '//fonts.cdnfonts.com/css/diana-the-princess'
+  document.head.appendChild(link)
+})()
+
 // Фирменное написание названия магазина прописью
 function wordmark(name) {
   const raw = String(name || '').trim()
